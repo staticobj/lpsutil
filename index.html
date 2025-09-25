@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="main.css">
-    <script type="text/javascript" src="main.js"></script>
   </head>
 
   <body>
@@ -13,10 +12,73 @@
       <h1>lpsutil</h1>
     </header>
     <main>
-      <p>Hello world!</p>
+      <form id="metrics">
+        <h2>Overview</h2>
+        <div class="ui-whitespace">
+          <div class="ui-table">
+            <div class="ui-table-row">
+              <div class="ui-table-col-50">
+                <span>Total Cases</span>
+              </div>
+              <div class="ui-table-col-50">
+                <input type="number" id="" value="0">
+              </div>
+            </div>
+            <div class="ui-table-row">
+              <div class="ui-table-col-50">
+                <span>Tasked Associates</span>
+              </div>
+              <div class="ui-table-col-50">
+                <input type="number" id="" value="0">
+              </div>
+            </div>
+            <div class="ui-table-row">
+              <div class="ui-table-col-50">
+                <span>Task Start</span>
+              </div>
+              <div class="ui-table-col-50">
+                <input type="time" id="" min="00:00" max="24:00" value="00:00">
+              </div>
+            </div>
+            <div class="ui-table-row">
+              <div class="ui-table-col-50">
+                <span>Task End</span>
+              </div>
+              <div class="ui-table-col-50">
+                <input type="time" id="" min="00:00" max="24:00" value="00:00">
+              </div>
+            </div>
+            <div class="ui-table-row">
+              <div class="ui-table-col-50">
+                <span>Lunch</span>
+              </div>
+              <div class="ui-table-col-50">
+                <input type="checkbox" id="" value="1" checked="yes">
+              </div>
+            </div>
+            <div class="ui-table-row">
+              <div class="ui-table-col-50">
+                <span>CPH Target</span>
+              </div>
+              <div class="ui-table-col-50">
+                <input type="number" id="" value="45">
+              </div>
+            </div>
+            <div class="ui-table-row">
+              <div class="ui-table-col-50">
+                <span>Projected Cases</span>
+              </div>
+              <div class="ui-table-col-50">
+                <input type="number" id="" value="0">
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
     </main>
     <footer>
       <p>version 0.0.1</p>
     </footer>
+    <script type="text/javascript" src="main.js"></script>
   </body>
 </html>
