@@ -12,7 +12,10 @@
       <h1>lpsutil</h1>
     </header>
     <main>
-      <form id="metrics">
+      <form id="metricsAdd" class="ui-metrics">
+        <div class="ui-metrics-add"><input type="text" id="metricAddAisle" value=""><input type="button" id="metricAddLocation" value="+"></div>
+      </form>
+      <form id="metrics" class="ui-metrics">
         <h2>Overview</h2>
         <div class="ui-whitespace">
           <div class="ui-table">
@@ -74,10 +77,11 @@
             </div>
           </div>
         </div>
+        <div id="metricAisles"></div>
       </form>
     </main>
     <footer>
-      <p>version 0.1</p>
+      <p>version 0.2</p>
     </footer>
     <script type="text/javascript" src="main.js"></script>
   </body>
