@@ -87,12 +87,13 @@ class StockMetrics extends ElementDataAccess {
         let totalAllMinutes = 0, 
         allHours = taskEnd.hour - taskStart.hour, // The hours we have tasked without a lunch.
         allMinutes = taskEnd.minute;// Minutes we have after the last hour.
-        if (taskStart.minute > 0) {
-            totalAllMinutes += 60 - taskStart.minute;// Minutes remaining in the first hour.
-            if (allHours > 0) {
-                allHours--;
-            }
-        }
+        allMinutes = taskEnd.minute - taskStart.minute;
+        //if (taskStart.minute > 0) {
+            //totalAllMinutes += 60 - taskStart.minute;// Minutes remaining in the first hour.
+            //if (allHours > 0) {
+            //    allHours--;
+            //}
+        //}
         totalAllMinutes += allMinutes;
         if (allHours > 0) {
             totalAllMinutes += allHours * 60;
