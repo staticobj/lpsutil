@@ -76,6 +76,7 @@ class StockMetrics extends ElementDataAccess {
         wisheAllMinutes += taskStart.minute;
         let wisheHour = Math.floor(taskStart.hour + (wisheAllMinutes / 60)).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}), 
         wisheMinute = Math.floor(wisheAllMinutes % 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false});
+        wisheAllMinutes -= taskStart.minute;
         
         this.setTime('metricWishe' + id, {'hour' : wisheHour, 'minute' :  wisheMinute});
 
@@ -87,11 +88,17 @@ class StockMetrics extends ElementDataAccess {
 
         let totalAllMinutes = 0, 
         allHours = taskEnd.hour - taskStart.hour, // The hours we have tasked without a lunch.
-        allMinutes = taskEnd.minute - taskStart.minute;// Minutes we have after the last hour.
-        totalAllMinutes += allMinutes;
+
+        allMinutes = taskEnd.minute;// Minutes we have after the last hour.
+        if (allHours == 1) {
+            allMinutes += 60 - taskStart.minute;
+            allHours--;
+        }
         if (allHours > 0) {
             totalAllMinutes += allHours * 60;
         }
+        totalAllMinutes += allMinutes;
+
         if (taskLunch) {
             if (totalAllMinutes > 60) {
                 totalAllMinutes -= 60;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
@@ -100,7 +107,6 @@ class StockMetrics extends ElementDataAccess {
         if (totalAllMinutes < 0) {
             totalAllMinutes = 0;
         }
-        
         let aisleTimeloss = totalAllMinutes - wisheAllMinutes;
         this.setInteger('metricTimeloss' + id, aisleTimeloss);
 
