@@ -49,7 +49,7 @@ class ElementDataAccess {
     }
     isChecked(id) {
         let element = document.getElementById(id);
-        if (element.checked) {
+        if (element.checked === true) {
             return true;
         }
         return false;
@@ -67,7 +67,7 @@ class StockMetrics extends ElementDataAccess {
         let wisheAllMinutes = (60 / cphTarget) * taskCases; // Divide the target cases by 60 minutes for the time per case, and multiply by the tasked cases for the total minutes tasked.
         if (taskLunch) {
             if (wisheAllMinutes > 60) {
-                wisheAllMinutes -= 60;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
+                wisheAllMinutes += 60;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
             }
         }
         if (wisheAllMinutes < 0) {
@@ -90,11 +90,11 @@ class StockMetrics extends ElementDataAccess {
         allHours = taskEnd.hour - taskStart.hour, // The hours we have tasked without a lunch.
 
         allMinutes = taskEnd.minute;// Minutes we have after the last hour.
-        if (allHours == 1) {
-            allMinutes += 60 - taskStart.minute;
-            allHours--;
-        }
-        if (allHours > 0) {
+        allMinutes += 60 - taskStart.minute;
+        if (allHours > 1) {
+            if (taskStart.minute > 0) {
+                allHours--;
+            }
             totalAllMinutes += allHours * 60;
         }
         totalAllMinutes += allMinutes;
@@ -103,11 +103,14 @@ class StockMetrics extends ElementDataAccess {
             if (totalAllMinutes > 60) {
                 totalAllMinutes -= 60;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
             }
+            if (wisheAllMinutes > 60) {
+                wisheAllMinutes -= 60;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
+            }
         }
         if (totalAllMinutes < 0) {
             totalAllMinutes = 0;
         }
-        let aisleTimeloss = totalAllMinutes - wisheAllMinutes;
+        let aisleTimeloss = totalAllMinutes - (wisheAllMinutes);
         this.setInteger('metricTimeloss' + id, aisleTimeloss);
 
         let caseProjection = Math.ceil(60 / (totalAllMinutes / taskCases));// Total task minutes divided by the number of cases for the minutes per case. Then divided that by how many minutes are in an hour to get the cases per minute.
