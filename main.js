@@ -92,9 +92,7 @@ class StockMetrics extends ElementDataAccess {
         allMinutes = taskEnd.minute;// Minutes we have after the last hour.
         allMinutes += 60 - taskStart.minute;
         if (allHours > 1) {
-            if (taskStart.minute > 0) {
-                allHours--;
-            }
+            allHours--;
             totalAllMinutes += allHours * 60;
         }
         totalAllMinutes += allMinutes;
@@ -113,6 +111,7 @@ class StockMetrics extends ElementDataAccess {
         let aisleTimeloss = totalAllMinutes - (wisheAllMinutes);
         this.setInteger('metricTimeloss' + id, aisleTimeloss);
 
+        console.log('caseProjection ' + totalAllMinutes + '/' + taskCases);
         let caseProjection = Math.ceil(60 / (totalAllMinutes / taskCases));// Total task minutes divided by the number of cases for the minutes per case. Then divided that by how many minutes are in an hour to get the cases per minute.
         this.setInteger('metricTaskCph' + id, caseProjection);
     }
