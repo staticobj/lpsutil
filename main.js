@@ -115,8 +115,9 @@ class StockMetrics extends ElementDataAccess {
         this.setInteger('metricTaskCph' + id, caseProjection);
     }
     aisleAddLocation(id, name) {
-        let listAisles = document.getElementById('metricAisles');
-        let uiHeading = document.createElement('h2'),
+        let metricCards = document.getElementById('metricCards');
+        let uiMetricCard = document.createElement('div'), 
+            uiHeading = document.createElement('h2'),
             uiHeadingMarkComplete = document.createElement('input'),
             uiWhitespace = document.createElement('div'),
             uiTable = document.createElement('div'),
@@ -140,6 +141,8 @@ class StockMetrics extends ElementDataAccess {
             uiSpanCph = document.createElement('span'),
             uiTableCol1Timeloss = document.createElement('div'),
             uiPTimeloss = document.createElement('p');
+
+        uiMetricCard.className = 'ui-metric-card';
 
         uiWhitespace.className = 'ui-whitespace';
         uiTable.id = 'marked_completed_' + id;
@@ -216,15 +219,17 @@ class StockMetrics extends ElementDataAccess {
 
         uiTable.appendChild(uiTableRow);
         uiWhitespace.appendChild(uiTable);
-        listAisles.prepend(uiWhitespace);
+        uiMetricCard.prepend(uiWhitespace);
         
         uiHeading.className = 'heading';
         uiHeading.innerText = name;
-        uiHeadingMarkComplete.id = 'metricMarkComplete' + id;
-        uiHeadingMarkComplete.setAttribute('type', 'checkbox');
-        uiHeadingMarkComplete.setAttribute('value', 1);
-        uiHeading.appendChild(uiHeadingMarkComplete);
-        listAisles.prepend(uiHeading);
+        // Future addition to check for completion of tasks
+        //uiHeadingMarkComplete.id = 'metricMarkComplete' + id;
+        //uiHeadingMarkComplete.setAttribute('type', 'checkbox');
+        //uiHeadingMarkComplete.setAttribute('value', 1);
+        //uiHeading.appendChild(uiHeadingMarkComplete);
+        uiMetricCard.prepend(uiHeading);
+        metricCards.prepend(uiMetricCard);
     }
 }
 
@@ -241,6 +246,7 @@ class StockMetrics extends ElementDataAccess {
             "id": id, 
             "name": name
         });
+        document.getElementById('metricAddAisle').value = '';
     });
     document.getElementById('metrics').addEventListener('change', (event) => {
         let taskedAssociates = stockMetrics.getInteger('metricTaskedAssociates'), 

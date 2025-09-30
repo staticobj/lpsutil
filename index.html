@@ -12,7 +12,7 @@
       <h1>lpsutil</h1>
     </header>
     <main>
-      <form id="metricsAdd" class="ui-metrics" style="background-color: #3a2a6d;">
+      <form id="metricsAdd" class="ui-metric-card" style="background-color: #3a2a6d;">
         <div class="ui-metrics-add">
           <div class="ui-whitespace" style="margin: 5px;">
           <div class="ui-table-add-metric">
@@ -27,73 +27,75 @@
           </div>
         </div>
       </form>
-      <form id="metrics" class="ui-metrics">
-        <h2>Overview</h2>
-        <div class="ui-whitespace">
-          <div class="ui-table">
-            <div class="ui-table-row">
-              <div class="ui-table-col-50">
-                <span>Total Cases</span>
+      <form id="metrics">
+        <div class="ui-metric-card">
+          <h2>Overview</h2>
+          <div class="ui-whitespace">
+            <div class="ui-table">
+              <div class="ui-table-row">
+                <div class="ui-table-col-50">
+                  <span>Total Cases</span>
+                </div>
+                <div class="ui-table-col-50">
+                  <input type="number" id="metricTotalCases" value="0">
+                </div>
               </div>
-              <div class="ui-table-col-50">
-                <input type="number" id="metricTotalCases" value="0">
+              <div class="ui-table-row">
+                <div class="ui-table-col-50">
+                  <span>Tasked Associates</span>
+                </div>
+                <div class="ui-table-col-50">
+                  <input type="number" id="metricTaskedAssociates" value="0">
+                </div>
               </div>
-            </div>
-            <div class="ui-table-row">
-              <div class="ui-table-col-50">
-                <span>Tasked Associates</span>
+              <div class="ui-table-row">
+                <div class="ui-table-col-50">
+                  <span>Task Start</span>
+                </div>
+                <div class="ui-table-col-50">
+                  <input type="time" id="metricTaskStart" min="00:00" max="24:00" value="00:00">
+                </div>
               </div>
-              <div class="ui-table-col-50">
-                <input type="number" id="metricTaskedAssociates" value="0">
+              <div class="ui-table-row">
+                <div class="ui-table-col-50">
+                  <span>Task End</span>
+                </div>
+                <div class="ui-table-col-50">
+                  <input type="time" id="metricTaskEnd" min="00:00" max="24:00" value="23:59">
+                </div>
               </div>
-            </div>
-            <div class="ui-table-row">
-              <div class="ui-table-col-50">
-                <span>Task Start</span>
+              <div class="ui-table-row">
+                <div class="ui-table-col-50">
+                  <span>Lunch</span>
+                </div>
+                <div class="ui-table-col-50">
+                  <input type="checkbox" id="metricTaskLunch" value="1" checked="no">
+                </div>
               </div>
-              <div class="ui-table-col-50">
-                <input type="time" id="metricTaskStart" min="00:00" max="24:00" value="00:00">
+              <div class="ui-table-row">
+                <div class="ui-table-col-50">
+                  <span>CPH Target</span>
+                </div>
+                <div class="ui-table-col-50">
+                  <input type="number" id="metricCphTarget" value="45">
+                </div>
               </div>
-            </div>
-            <div class="ui-table-row">
-              <div class="ui-table-col-50">
-                <span>Task End</span>
-              </div>
-              <div class="ui-table-col-50">
-                <input type="time" id="metricTaskEnd" min="00:00" max="24:00" value="23:59">
-              </div>
-            </div>
-            <div class="ui-table-row">
-              <div class="ui-table-col-50">
-                <span>Lunch</span>
-              </div>
-              <div class="ui-table-col-50">
-                <input type="checkbox" id="metricTaskLunch" value="1" checked="no">
-              </div>
-            </div>
-            <div class="ui-table-row">
-              <div class="ui-table-col-50">
-                <span>CPH Target</span>
-              </div>
-              <div class="ui-table-col-50">
-                <input type="number" id="metricCphTarget" value="45">
-              </div>
-            </div>
-            <div class="ui-table-row">
-              <div class="ui-table-col-50">
-                <span>Projected Cases</span>
-              </div>
-              <div class="ui-table-col-50">
-                <input type="number" id="metricProjectedCases" value="0">
+              <div class="ui-table-row">
+                <div class="ui-table-col-50">
+                  <span>Projected Cases</span>
+                </div>
+                <div class="ui-table-col-50">
+                  <input type="number" id="metricProjectedCases" value="0">
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div id="metricAisles"></div>
+        <div id="metricCards"></div>
       </form>
     </main>
     <footer>
-      <p>version 0.2f</p>
+      <p>version 0.2g</p>
     </footer>
     <script type="text/javascript" src="main.js"></script>
   </body>
