@@ -67,7 +67,7 @@ class StockMetrics extends ElementDataAccess {
         let wisheAllMinutes = (60 / cphTarget) * taskCases; // Divide the target cases by 60 minutes for the time per case, and multiply by the tasked cases for the total minutes tasked.
         if (taskLunch) {
             if (wisheAllMinutes > 60) {
-                wisheAllMinutes += 60;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
+                wisheAllMinutes += 60;// We're going to add X minutes for lunch, but only if we have more than X minutes tasked.
             }
         }
         if (wisheAllMinutes < 0) {
@@ -111,7 +111,6 @@ class StockMetrics extends ElementDataAccess {
         let aisleTimeloss = totalAllMinutes - (wisheAllMinutes);
         this.setInteger('metricTimeloss' + id, aisleTimeloss);
 
-        console.log('caseProjection ' + totalAllMinutes + '/' + taskCases);
         let caseProjection = Math.ceil(60 / (totalAllMinutes / taskCases));// Total task minutes divided by the number of cases for the minutes per case. Then divided that by how many minutes are in an hour to get the cases per minute.
         this.setInteger('metricTaskCph' + id, caseProjection);
     }
@@ -209,7 +208,7 @@ class StockMetrics extends ElementDataAccess {
         uiTableCol2Cph.appendChild(uiSpanCph);
         uiTableRow.appendChild(uiTableCol2Cph);
 
-        uiTableCol1Timeloss.className = 'ui-table-col-100 ui-attention';
+        uiTableCol1Timeloss.className = 'ui-table-col-100';
         uiPTimeloss.className = 'ui-attention';
         uiPTimeloss.innerHTML = 'We lost <span id="metricTimeloss' + id + '">0</span> minutes.';
         uiTableCol1Timeloss.appendChild(uiPTimeloss);

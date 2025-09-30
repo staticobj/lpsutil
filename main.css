@@ -50,7 +50,7 @@ div.ui-metrics-add {
     text-align: center;
     color: #ffffff;
     width: 100%;
-    padding: 10px 0 10px 0;
+    padding: 0;
     margin: 0;
     background-color: #3a2a6d;
 }
@@ -82,20 +82,100 @@ input::-webkit-inner-spin-button {
 div.ui-table {
     display: table;
     width: 100%;
-
-    div.ui-table-row {
+}
+div.ui-table-row {
         display: table-row;
         width: 100%;
         padding-top: 5px;
         padding-bottom: 5px;
         clear: both;
-    }
 }
-div.ui-table-row {
-    div.ui-table-col-50 {
-        float: left;/* buggy browsers */
-        display: table-column;
-        width: 50%;
-        padding: 5px 0 5px 0;
-    }
+div.ui-table-col-50 {
+    float: left;/* buggy browsers */
+    display: table-column;
+    width: 50%;
+    padding: 5px 0 5px 0;
+}
+div.ui-table-col-100 {
+    float: left;/* buggy browsers */
+    display: table-column;
+    width: 100%;
+    padding: 5px 0 5px 0;
+}
+.ui-attention {
+    position: relative;
+    color: #ffffff;
+    margin: 5px;
+    padding: 10px;
+    background-color: #a77bca;
+    border-radius: 10px;
+}
+div.ui-table-add-metric {
+    display: table;
+    width: 100%;
+    height: 50px;
+    padding: 0;
+    margin: 0;
+}
+div.ui-table-row-add-metric {
+    display: table-row;
+    width: 100%;
+    height: 40px;
+    clear: both;
+}
+div.ui-table-col-add-aisle {
+    float: left;
+    display: table-column;
+    width: 90%;
+    height: 40px;
+    padding: 5px 0 5px 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+}
+div.ui-table-col-add-button {
+    float: left;
+    display: table-column;
+    width: 10%;
+    height: 40px;
+    padding: 5px 0 5px 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+}
+input.ui-metrics-add-aisle {
+    font-size: 24px;
+    font-weight: bold;
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 5px;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    border-left: 1px solid #000000;
+    border-right: 0;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 0;
+    box-sizing: border-box;
+}
+input.ui-metrics-add-button {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    background-color: #a77bca;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    border-left: 0;
+    border-right: 1px solid #000000;
+    border-top-left-radius: 0;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 5px;
+    box-sizing: border-box;
 }
