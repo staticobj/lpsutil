@@ -35,6 +35,8 @@ class ElementDataAccess {
     setTime(id, value) {
         if (value.hasOwnProperty('hour') && value.hasOwnProperty('minute'))
         {
+            value.hour = Math.floor(value.hour).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false});
+            value.minute = Math.floor(value.minute).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false});
             let element = document.getElementById(id), time;
             time = Object.values(value).join(':');
             if (element.innerText) {
@@ -56,13 +58,16 @@ class ElementDataAccess {
     }
 }
 class StockMetrics extends ElementDataAccess {
-    aisleDataChange(id) {
+    aisleDataChange(metricCard) {
         let cphTarget = this.getInteger('metricCphTarget'), 
-        taskCases = this.getInteger('metricCases' + id),
-        taskStart = this.getTime('metricTaskStart' + id),
-        taskLunch = this.isChecked('metricTaskLunch' + id),
-        taskEnd = this.getTime('metricTaskEnd' + id),
-        taskCph = this.getInteger('metricTaskCph' + id);  
+        taskCases = this.getInteger('metricCases' + metricCard.id),
+        taskStart = this.getTime('metricTaskStart' + metricCard.id),
+        taskLunch = this.isChecked('metricTaskLunch' + metricCard.id),
+        taskEnd = this.getTime('metricTaskEnd' + metricCard.id),
+        taskCph = this.getInteger('metricTaskCph' + metricCard.id);
+        metricCard.taskCases = taskCases;
+        metricCard.taskStart = taskStart;
+        metricCard.taskLunch = taskLunch;
 
         let wisheAllMinutes = (60 / cphTarget) * taskCases; // Divide the target cases by 60 minutes for the time per case, and multiply by the tasked cases for the total minutes tasked.
         if (taskLunch) {
@@ -78,13 +83,14 @@ class StockMetrics extends ElementDataAccess {
         wisheMinute = Math.floor(wisheAllMinutes % 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false});
         wisheAllMinutes -= taskStart.minute;
         
-        this.setTime('metricWishe' + id, {'hour' : wisheHour, 'minute' :  wisheMinute});
+        this.setTime('metricWishe' + metricCard.id, {'hour' : wisheHour, 'minute' :  wisheMinute});
 
         if (taskCph == 0) {// We don't want to update the time the task ends yet.
             // The task may go over the alloted time.
-            this.setTime('metricTaskEnd' + id, {'hour' : wisheHour, 'minute' :  wisheMinute});
+            this.setTime('metricTaskEnd' + metricCard.id, {'hour' : wisheHour, 'minute' :  wisheMinute});
         }
-        taskEnd = this.getTime('metricTaskEnd' + id);
+        taskEnd = this.getTime('metricTaskEnd' + metricCard.id);
+        metricCard.taskEnd = taskEnd;
 
         let totalAllMinutes = 0, 
         allHours = taskEnd.hour - taskStart.hour, // The hours we have tasked without a lunch.
@@ -109,12 +115,13 @@ class StockMetrics extends ElementDataAccess {
             totalAllMinutes = 0;
         }
         let aisleTimeloss = totalAllMinutes - (wisheAllMinutes);
-        this.setInteger('metricTimeloss' + id, aisleTimeloss);
+        this.setInteger('metricTimeloss' + metricCard.id, aisleTimeloss);
 
         let caseProjection = Math.ceil(60 / (totalAllMinutes / taskCases));// Total task minutes divided by the number of cases for the minutes per case. Then divided that by how many minutes are in an hour to get the cases per minute.
-        this.setInteger('metricTaskCph' + id, caseProjection);
+        this.setInteger('metricTaskCph' + metricCard.id, caseProjection);
+        return metricCard;
     }
-    aisleAddLocation(id, name) {
+    aisleAddLocation(metricCard) {
         let metricCards = document.getElementById('metricCards');
         let uiMetricCard = document.createElement('div'), 
             uiHeading = document.createElement('h2'),
@@ -145,7 +152,7 @@ class StockMetrics extends ElementDataAccess {
         uiMetricCard.className = 'ui-metric-card';
 
         uiWhitespace.className = 'ui-whitespace';
-        uiTable.id = 'marked_completed_' + id;
+        uiTable.id = 'marked_completed_' + metricCard.id;
         uiTable.className = 'ui-uiTable';
         uiTable.style.opacity = '100%';
         uiTableRow.className = 'ui-table-row';
@@ -155,8 +162,8 @@ class StockMetrics extends ElementDataAccess {
         uiTableRow.appendChild(uiTableCol1Cases);
         uiTableCol2Cases.className = 'ui-table-col-50';
         uiInputTaskCases.setAttribute('type', 'number');
-        uiInputTaskCases.setAttribute('value', 0);
-        uiInputTaskCases.setAttribute('id', 'metricCases' + id);
+        uiInputTaskCases.setAttribute('value', metricCard.taskCases);
+        uiInputTaskCases.setAttribute('id', 'metricCases' + metricCard.id);
         uiTableCol2Cases.appendChild(uiInputTaskCases);
         uiTableRow.appendChild(uiTableCol2Cases);
 
@@ -167,8 +174,8 @@ class StockMetrics extends ElementDataAccess {
         uiInputTaskStart.setAttribute('type', 'time');
         uiInputTaskStart.setAttribute('min', '00:00');
         uiInputTaskStart.setAttribute('max', '24:00');
-        uiInputTaskStart.setAttribute('value', '00:00');
-        uiInputTaskStart.setAttribute('id', 'metricTaskStart' + id);
+        uiInputTaskStart.setAttribute('value', Math.floor(metricCard.taskStart.hour).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}) + ':' + Math.floor(metricCard.taskStart.minute).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}));
+        uiInputTaskStart.setAttribute('id', 'metricTaskStart' + metricCard.id);
         uiTableCol2TaskStart.appendChild(uiInputTaskStart);
         uiTableRow.appendChild(uiTableCol2TaskStart);
 
@@ -178,7 +185,8 @@ class StockMetrics extends ElementDataAccess {
         uiTableCol2TaskLunch.className = 'ui-table-col-50';
         uiInputTaskLunch.setAttribute('type', 'checkbox');
         uiInputTaskLunch.setAttribute('value', 1);
-        uiInputTaskLunch.setAttribute('id', 'metricTaskLunch' + id);
+        uiInputTaskLunch.checked = metricCard.taskLunch;
+        uiInputTaskLunch.setAttribute('id', 'metricTaskLunch' + metricCard.id);
         uiTableCol2TaskLunch.appendChild(uiInputTaskLunch);
         uiTableRow.appendChild(uiTableCol2TaskLunch);
 
@@ -189,15 +197,15 @@ class StockMetrics extends ElementDataAccess {
         uiInputTaskEnd.setAttribute('type', 'time');
         uiInputTaskEnd.setAttribute('min', '00:00');
         uiInputTaskEnd.setAttribute('max', '24:00');
-        uiInputTaskEnd.setAttribute('value', '00:00');
-        uiInputTaskEnd.setAttribute('id', 'metricTaskEnd' + id);
+        uiInputTaskEnd.setAttribute('value', Math.floor(metricCard.taskEnd.hour).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}) + ':' + Math.floor(metricCard.taskEnd.minute).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}));
+        uiInputTaskEnd.setAttribute('id', 'metricTaskEnd' + metricCard.id);
         uiTableCol2TaskEnd.appendChild(uiInputTaskEnd);
         uiTableRow.appendChild(uiTableCol2TaskEnd);
 
         uiTableCol1Wishe.className = 'ui-table-col-100';
         uiPWishe.className = 'ui-attention';
         uiPWishe.innerText = 'When it should have ended: ';
-        uiPWishe.innerHTML += '<span id="metricWishe' + id + '">00:00</span>';
+        uiPWishe.innerHTML += '<span id="metricWishe' + metricCard.id + '">00:00</span>';
         uiTableCol1Wishe.appendChild(uiPWishe);
         uiTableRow.appendChild(uiTableCol1Wishe);
 
@@ -207,13 +215,13 @@ class StockMetrics extends ElementDataAccess {
         uiTableRow.appendChild(uiTableCol1Cph);
         uiTableCol2Cph.className = 'ui-table-col-50';
         uiSpanCph.innerText = 0;
-        uiSpanCph.setAttribute('id', 'metricTaskCph' + id);
+        uiSpanCph.setAttribute('id', 'metricTaskCph' + metricCard.id);
         uiTableCol2Cph.appendChild(uiSpanCph);
         uiTableRow.appendChild(uiTableCol2Cph);
 
         uiTableCol1Timeloss.className = 'ui-table-col-100';
         uiPTimeloss.className = 'ui-attention';
-        uiPTimeloss.innerHTML = 'We lost <span id="metricTimeloss' + id + '">0</span> minutes.';
+        uiPTimeloss.innerHTML = 'We lost <span id="metricTimeloss' + metricCard.id + '">0</span> minutes.';
         uiTableCol1Timeloss.appendChild(uiPTimeloss);
         uiTableRow.appendChild(uiTableCol1Timeloss);
 
@@ -222,7 +230,7 @@ class StockMetrics extends ElementDataAccess {
         uiMetricCard.prepend(uiWhitespace);
         
         uiHeading.className = 'heading';
-        uiHeading.innerText = name;
+        uiHeading.innerText = metricCard.name;
         // Future addition to check for completion of tasks
         //uiHeadingMarkComplete.id = 'metricMarkComplete' + id;
         //uiHeadingMarkComplete.setAttribute('type', 'checkbox');
@@ -234,26 +242,63 @@ class StockMetrics extends ElementDataAccess {
 }
 
 (function() {
-    const appSession = {"aisles": []};
+    let ls = JSON.parse(window.localStorage.getItem('appSession'));
+    if (ls == null) {
+        ls = {
+            "metricTotalCases": 0, 
+            "metricTaskedAssociates": 0, 
+            "metricTaskStart": 0,
+            "metricTaskEnd": 0, 
+            "metricTaskLunch": true, 
+            "metricCphTarget": 45, 
+            "metricCards": []
+        };
+    }
+    var appSession = ls;
 
     let stockMetrics = new StockMetrics();
+    stockMetrics.setInteger('metricTotalCases', appSession.metricTotalCases);
+    stockMetrics.setInteger('metricTaskedAssociates', appSession.metricTaskedAssociates);
+    stockMetrics.setTime('metricTaskStart', appSession.metricTaskStart);
+    stockMetrics.setTime('metricTaskEnd', appSession.metricTaskEnd);
+    //stockMetrics.isChecked('metricTaskLunch');
+    stockMetrics.setInteger('metricCphTarget', appSession.metricCphTarget);
 
     document.getElementById('metricAddLocation').addEventListener('click', (event) => {
         let id = Math.random().toString(36).substring(0, 36), // Generating random a random string of letters and numbers.
         name = document.getElementById('metricAddAisle').value;
-        stockMetrics.aisleAddLocation(id, name);
-        appSession["aisles"].push({
+        let metricCard = {
             "id": id, 
-            "name": name
-        });
+            "name": name,
+            "taskCases": 0,
+            "taskStart": {"hour": 0, "minute": 0},
+            "taskEnd": {"hour": 0, "minute": 0},
+            "taskLunch": false
+        };
+        stockMetrics.aisleAddLocation(metricCard);
+        appSession["metricCards"].push(metricCard);
         document.getElementById('metricAddAisle').value = '';
     });
+    let aisleLen = appSession.metricCards.length;
+    for (var i = 0; i < aisleLen; i++) {
+        stockMetrics.aisleAddLocation(appSession.metricCards[i]);
+        appSession.metricCards[i] = stockMetrics.aisleDataChange(appSession.metricCards[i]);
+    }
     document.getElementById('metrics').addEventListener('change', (event) => {
-        let taskedAssociates = stockMetrics.getInteger('metricTaskedAssociates'), 
+        let totalCases = stockMetrics.getInteger('metricTotalCases'), 
+        taskedAssociates = stockMetrics.getInteger('metricTaskedAssociates'), 
         taskStart = stockMetrics.getTime('metricTaskStart'), 
         taskEnd = stockMetrics.getTime('metricTaskEnd'), 
         taskLunch = stockMetrics.isChecked('metricTaskLunch'), 
         cphTarget = stockMetrics.getInteger('metricCphTarget');
+        
+        appSession.metricTotalCases = totalCases;
+        appSession.metricTaskedAssociates = taskedAssociates;
+        appSession.metricTaskStart = taskStart;
+        appSession.metricTaskEnd = taskEnd;
+        appSession.metricTaskLunch = taskLunch;
+        appSession.metricCphTarget = cphTarget;
+
         let totalAllMinutes = 0, 
         allHours = taskEnd.hour - taskStart.hour, // The hours we have tasked without a lunch.
         allMinutes = taskEnd.minute;// Minutes we have after the last hour.
@@ -275,10 +320,11 @@ class StockMetrics extends ElementDataAccess {
         let mpcTarget = 60/cphTarget; // Minutes in one hour divided by the target cases per hour gives the minutes per case.
         let caseProjection = (totalAllMinutes / mpcTarget) * taskedAssociates;
         stockMetrics.setInteger('metricProjectedCases', caseProjection);
-
-        let aisleLen = appSession.aisles.length;
+        
+        let aisleLen = appSession.metricCards.length;
         for (var i = 0; i < aisleLen; i++) {
-            stockMetrics.aisleDataChange(appSession.aisles[i].id);
+            appSession.metricCards[i] = stockMetrics.aisleDataChange(appSession.metricCards[i]);
         }
+        window.localStorage.setItem('appSession', JSON.stringify(appSession));
     });
 })();
