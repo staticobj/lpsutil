@@ -202,17 +202,6 @@ class StockMetrics extends ElementDataAccess {
         uiTableCol2TaskStart.appendChild(uiInputTaskStart);
         uiTableRow.appendChild(uiTableCol2TaskStart);
 
-        uiTableCol1TaskLunch.className = 'ui-table-col-50';
-        uiTableCol1TaskLunch.innerText = "Lunch";
-        uiTableRow.appendChild(uiTableCol1TaskLunch);
-        uiTableCol2TaskLunch.className = 'ui-table-col-50';
-        uiInputTaskLunch.setAttribute('type', 'checkbox');
-        uiInputTaskLunch.setAttribute('value', 1);
-        uiInputTaskLunch.checked = metricCard.taskLunch;
-        uiInputTaskLunch.setAttribute('id', 'metricTaskLunch' + metricCard.id);
-        uiTableCol2TaskLunch.appendChild(uiInputTaskLunch);
-        uiTableRow.appendChild(uiTableCol2TaskLunch);
-
         uiTableCol1TaskEnd.className = 'ui-table-col-50';
         uiTableCol1TaskEnd.innerText = "Task End";
         uiTableRow.appendChild(uiTableCol1TaskEnd);
@@ -224,6 +213,17 @@ class StockMetrics extends ElementDataAccess {
         uiInputTaskEnd.setAttribute('id', 'metricTaskEnd' + metricCard.id);
         uiTableCol2TaskEnd.appendChild(uiInputTaskEnd);
         uiTableRow.appendChild(uiTableCol2TaskEnd);
+
+        uiTableCol1TaskLunch.className = 'ui-table-col-50';
+        uiTableCol1TaskLunch.innerText = "Lunch";
+        uiTableRow.appendChild(uiTableCol1TaskLunch);
+        uiTableCol2TaskLunch.className = 'ui-table-col-50';
+        uiInputTaskLunch.setAttribute('type', 'checkbox');
+        uiInputTaskLunch.setAttribute('value', 1);
+        uiInputTaskLunch.checked = metricCard.taskLunch;
+        uiInputTaskLunch.setAttribute('id', 'metricTaskLunch' + metricCard.id);
+        uiTableCol2TaskLunch.appendChild(uiInputTaskLunch);
+        uiTableRow.appendChild(uiTableCol2TaskLunch);
 
         uiTableCol1Wishe.className = 'ui-table-col-100';
         uiPWishe.className = 'ui-attention';
