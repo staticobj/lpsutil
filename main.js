@@ -338,7 +338,9 @@ class StockMetrics extends ElementDataAccess {
 
         let aisleLen = stockMetrics.data.metricCards.length;
         for (var i = 0; i < aisleLen; i++) {
-            stockMetrics.data.metricCards[i] = stockMetrics.updateMetricCard(stockMetrics.data.metricCards[i]);
+            if (stockMetrics.data.metricCards[i] != null) {
+                stockMetrics.data.metricCards[i] = stockMetrics.updateMetricCard(stockMetrics.data.metricCards[i]);
+            }
         }
         stockMetrics.dataSave();
     });
