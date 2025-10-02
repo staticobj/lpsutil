@@ -56,9 +56,29 @@ class ElementDataAccess {
         }
         return false;
     }
-    
+
 }
 class StockMetrics extends ElementDataAccess {
+    data = {};
+    constructor() {
+        super();
+        let ls = JSON.parse(window.localStorage.getItem('appSession'));
+        if (ls == null) {
+            ls = {
+                "metricTotalCases": 0, 
+                "metricTaskedAssociates": 0, 
+                "metricTaskStart": 0,
+                "metricTaskEnd": 0, 
+                "metricTaskLunch": true, 
+                "metricCphTarget": 45, 
+                "metricCards": []
+            };
+        }
+        this.data = ls;
+    }
+    dataSave() {
+        window.localStorage.setItem('appSession', JSON.stringify(this.data));
+    }
     getElapsedMinutes(taskStart, taskEnd) {
         let dateTime = new Date();
         let dateTimeStart = new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate(), parseInt(taskStart.hour), parseInt(taskStart.minute), parseInt(0));
@@ -112,8 +132,11 @@ class StockMetrics extends ElementDataAccess {
         let elapsedMinutes = this.getElapsedMinutes(taskStart, taskEnd);
         elapsedMinutes = this.lunchElapsedMinutes(elapsedMinutes, taskLunch);
         wisheAllMinutes = this.lunchElapsedMinutes(wisheAllMinutes, taskLunch);
-        let aisleTimeloss = elapsedMinutes - (wisheAllMinutes);
-        this.setInteger('metricTimeloss' + metricCard.id, aisleTimeloss);
+        let elapsedTimeloss = Math.floor(elapsedMinutes - (wisheAllMinutes));
+        if (elapsedTimeloss < 0) {
+            elapsedTimeloss = 0;
+        }
+        this.setInteger('metricTimeloss' + metricCard.id, elapsedTimeloss);
 
         let caseProjection = Math.ceil(60 / (elapsedMinutes / taskCases));// Total task minutes divided by the number of cases for the minutes per case. Then divided that by how many minutes are in an hour to get the cases per minute.
         this.setInteger('metricTaskCph' + metricCard.id, caseProjection);
@@ -125,6 +148,7 @@ class StockMetrics extends ElementDataAccess {
         let uiMetricCard = document.createElement('div'), 
             uiHeading = document.createElement('h2'),
             uiHeadingMarkComplete = document.createElement('input'),
+            uiHeadingDelete = document.createElement('div'), 
             uiWhitespace = document.createElement('div'),
             uiTable = document.createElement('div'),
             uiTableRow = document.createElement('div'),
@@ -235,33 +259,35 @@ class StockMetrics extends ElementDataAccess {
         //uiHeadingMarkComplete.setAttribute('type', 'checkbox');
         //uiHeadingMarkComplete.setAttribute('value', 1);
         //uiHeading.appendChild(uiHeadingMarkComplete);
+        uiHeadingDelete.id = 'metricCardDelete' + metricCard.id;
+        uiHeadingDelete.className = 'ui-metric-card-delete';
+        uiHeadingDelete.innerHTML = '&#128942;';
+        uiHeadingDelete.addEventListener('click', (e) => {
+            let l = this.data.metricCards.length;
+            for (var i = 0; i < l; i++) {
+                if (this.data.metricCards[i] != null) {
+                    if (this.data.metricCards[i].id == metricCard.id) {
+                        delete this.data.metricCards[i];
+                    }
+                }
+            }
+            this.dataSave();
+            uiMetricCard.remove();
+        });
+        uiHeading.appendChild(uiHeadingDelete);
         uiMetricCard.prepend(uiHeading);
         metricCards.prepend(uiMetricCard);
     }
 }
 
 (function() {
-    let ls = JSON.parse(window.localStorage.getItem('appSession'));
-    if (ls == null) {
-        ls = {
-            "metricTotalCases": 0, 
-            "metricTaskedAssociates": 0, 
-            "metricTaskStart": 0,
-            "metricTaskEnd": 0, 
-            "metricTaskLunch": true, 
-            "metricCphTarget": 45, 
-            "metricCards": []
-        };
-    }
-    var appSession = ls;
-
     let stockMetrics = new StockMetrics();
-    stockMetrics.setInteger('metricTotalCases', appSession.metricTotalCases);
-    stockMetrics.setInteger('metricTaskedAssociates', appSession.metricTaskedAssociates);
-    stockMetrics.setTime('metricTaskStart', appSession.metricTaskStart);
-    stockMetrics.setTime('metricTaskEnd', appSession.metricTaskEnd);
+    stockMetrics.setInteger('metricTotalCases', stockMetrics.data.metricTotalCases);
+    stockMetrics.setInteger('metricTaskedAssociates', stockMetrics.data.metricTaskedAssociates);
+    stockMetrics.setTime('metricTaskStart', stockMetrics.data.metricTaskStart);
+    stockMetrics.setTime('metricTaskEnd', stockMetrics.data.metricTaskEnd);
     //stockMetrics.isChecked('metricTaskLunch');
-    stockMetrics.setInteger('metricCphTarget', appSession.metricCphTarget);
+    stockMetrics.setInteger('metricCphTarget', stockMetrics.data.metricCphTarget);
 
     document.getElementById('metricAddLocation').addEventListener('click', (event) => {
         let id = Math.random().toString(36).substring(0, 36), // Generating random a random string of letters and numbers.
@@ -275,13 +301,18 @@ class StockMetrics extends ElementDataAccess {
             "taskLunch": false
         };
         stockMetrics.addMetricCard(metricCard);
-        appSession["metricCards"].push(metricCard);
+        stockMetrics.data["metricCards"].push(metricCard);
+        stockMetrics.dataSave();
         document.getElementById('metricAddAisle').value = '';
     });
-    let aisleLen = appSession.metricCards.length;
+    let aisleLen = stockMetrics.data.metricCards.length;
     for (var i = 0; i < aisleLen; i++) {
-        stockMetrics.addMetricCard(appSession.metricCards[i]);
-        appSession.metricCards[i] = stockMetrics.updateMetricCard(appSession.metricCards[i]);
+        if (i in stockMetrics.data.metricCards) {
+            if (stockMetrics.data.metricCards[i] != null) {
+                stockMetrics.addMetricCard(stockMetrics.data.metricCards[i]);
+                stockMetrics.data.metricCards[i] = stockMetrics.updateMetricCard(stockMetrics.data.metricCards[i]);
+            }
+        }
     }
     document.getElementById('metrics').addEventListener('change', (event) => {
         let totalCases = stockMetrics.getInteger('metricTotalCases'), 
@@ -291,12 +322,12 @@ class StockMetrics extends ElementDataAccess {
         taskLunch = stockMetrics.isChecked('metricTaskLunch'), 
         cphTarget = stockMetrics.getInteger('metricCphTarget');
         
-        appSession.metricTotalCases = totalCases;
-        appSession.metricTaskedAssociates = taskedAssociates;
-        appSession.metricTaskStart = taskStart;
-        appSession.metricTaskEnd = taskEnd;
-        appSession.metricTaskLunch = taskLunch;
-        appSession.metricCphTarget = cphTarget;
+        stockMetrics.data.metricTotalCases = totalCases;
+        stockMetrics.data.metricTaskedAssociates = taskedAssociates;
+        stockMetrics.data.metricTaskStart = taskStart;
+        stockMetrics.data.metricTaskEnd = taskEnd;
+        stockMetrics.data.metricTaskLunch = taskLunch;
+        stockMetrics.data.metricCphTarget = cphTarget;
         
         let elapsedMinutes = stockMetrics.getElapsedMinutes(taskStart, taskEnd);
         elapsedMinutes = stockMetrics.lunchElapsedMinutes(elapsedMinutes, taskLunch);
@@ -305,10 +336,10 @@ class StockMetrics extends ElementDataAccess {
         let caseProjection = (elapsedMinutes / mpcTarget) * taskedAssociates;
         stockMetrics.setInteger('metricProjectedCases', caseProjection);
 
-        let aisleLen = appSession.metricCards.length;
+        let aisleLen = stockMetrics.data.metricCards.length;
         for (var i = 0; i < aisleLen; i++) {
-            appSession.metricCards[i] = stockMetrics.updateMetricCard(appSession.metricCards[i]);
+            stockMetrics.data.metricCards[i] = stockMetrics.updateMetricCard(stockMetrics.data.metricCards[i]);
         }
-        window.localStorage.setItem('appSession', JSON.stringify(appSession));
+        stockMetrics.dataSave();
     });
 })();
