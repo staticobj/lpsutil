@@ -261,7 +261,7 @@ class StockMetrics extends ElementDataAccess {
         //uiHeading.appendChild(uiHeadingMarkComplete);
         uiHeadingDelete.id = 'metricCardDelete' + metricCard.id;
         uiHeadingDelete.className = 'ui-metric-card-delete';
-        uiHeadingDelete.innerHTML = '&#128942;';
+        uiHeadingDelete.innerHTML = '&#9746;';
         uiHeadingDelete.addEventListener('click', (e) => {
             let l = this.data.metricCards.length;
             for (var i = 0; i < l; i++) {
