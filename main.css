@@ -59,7 +59,7 @@ div.ui-metrics-add {
     }
 }
 div.ui-metrics-add {
-    input[type="button"] {
+    input[type="button"] { 
     }
 }
 div.ui-whitespace {
@@ -178,4 +178,8 @@ input.ui-metrics-add-button {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 5px;
     box-sizing: border-box;
+}
+.ui-metric-card-delete {
+    display: inline-block;
+    padding-left: 10px;
 }
