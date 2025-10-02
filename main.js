@@ -56,9 +56,26 @@ class ElementDataAccess {
         }
         return false;
     }
+    
 }
 class StockMetrics extends ElementDataAccess {
-    aisleDataChange(metricCard) {
+    getElapsedMinutes(taskStart, taskEnd) {
+        let dateTime = new Date();
+        let dateTimeStart = new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate(), parseInt(taskStart.hour), parseInt(taskStart.minute), parseInt(0));
+        let dateTimeEnd = new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate(),parseInt(taskEnd.hour), parseInt(taskEnd.minute), parseInt(0));
+        return ((dateTimeEnd - dateTimeStart) / 1000) / 60;
+    }
+    lunchElapsedMinutes(elapsedMinutes, lunchState) {
+        let allotedMinutes = 60;
+        if (lunchState === false) {
+            return elapsedMinutes; 
+        }
+        if (elapsedMinutes > allotedMinutes) {
+            elapsedMinutes -= allotedMinutes;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
+        }
+        return elapsedMinutes;
+    }
+    updateMetricCard(metricCard) {
         let cphTarget = this.getInteger('metricCphTarget'), 
         taskCases = this.getInteger('metricCases' + metricCard.id),
         taskStart = this.getTime('metricTaskStart' + metricCard.id),
@@ -79,8 +96,8 @@ class StockMetrics extends ElementDataAccess {
             wisheAllMinutes = 0;
         }
         wisheAllMinutes += taskStart.minute;
-        let wisheHour = Math.floor(taskStart.hour + (wisheAllMinutes / 60)).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}), 
-        wisheMinute = Math.floor(wisheAllMinutes % 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false});
+        let wisheHour = taskStart.hour + (wisheAllMinutes / 60), 
+        wisheMinute = wisheAllMinutes % 60;
         wisheAllMinutes -= taskStart.minute;
         
         this.setTime('metricWishe' + metricCard.id, {'hour' : wisheHour, 'minute' :  wisheMinute});
@@ -92,37 +109,19 @@ class StockMetrics extends ElementDataAccess {
         taskEnd = this.getTime('metricTaskEnd' + metricCard.id);
         metricCard.taskEnd = taskEnd;
 
-        let totalAllMinutes = 0, 
-        allHours = taskEnd.hour - taskStart.hour, // The hours we have tasked without a lunch.
-
-        allMinutes = taskEnd.minute;// Minutes we have after the last hour.
-        allMinutes += 60 - taskStart.minute;
-        if (allHours > 1) {
-            allHours--;
-            totalAllMinutes += allHours * 60;
-        }
-        totalAllMinutes += allMinutes;
-
-        if (taskLunch) {
-            if (totalAllMinutes > 60) {
-                totalAllMinutes -= 60;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
-            }
-            if (wisheAllMinutes > 60) {
-                wisheAllMinutes -= 60;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
-            }
-        }
-        if (totalAllMinutes < 0) {
-            totalAllMinutes = 0;
-        }
-        let aisleTimeloss = totalAllMinutes - (wisheAllMinutes);
+        let elapsedMinutes = this.getElapsedMinutes(taskStart, taskEnd);
+        elapsedMinutes = this.lunchElapsedMinutes(elapsedMinutes, taskLunch);
+        wisheAllMinutes = this.lunchElapsedMinutes(wisheAllMinutes, taskLunch);
+        let aisleTimeloss = elapsedMinutes - (wisheAllMinutes);
         this.setInteger('metricTimeloss' + metricCard.id, aisleTimeloss);
 
-        let caseProjection = Math.ceil(60 / (totalAllMinutes / taskCases));// Total task minutes divided by the number of cases for the minutes per case. Then divided that by how many minutes are in an hour to get the cases per minute.
+        let caseProjection = Math.ceil(60 / (elapsedMinutes / taskCases));// Total task minutes divided by the number of cases for the minutes per case. Then divided that by how many minutes are in an hour to get the cases per minute.
         this.setInteger('metricTaskCph' + metricCard.id, caseProjection);
         return metricCard;
     }
-    aisleAddLocation(metricCard) {
-        let metricCards = document.getElementById('metricCards');
+    addMetricCard(metricCard) {
+        let div = document.createElement('div'), 
+        metricCards = document.getElementById('metricCards');
         let uiMetricCard = document.createElement('div'), 
             uiHeading = document.createElement('h2'),
             uiHeadingMarkComplete = document.createElement('input'),
@@ -275,14 +274,14 @@ class StockMetrics extends ElementDataAccess {
             "taskEnd": {"hour": 0, "minute": 0},
             "taskLunch": false
         };
-        stockMetrics.aisleAddLocation(metricCard);
+        stockMetrics.addMetricCard(metricCard);
         appSession["metricCards"].push(metricCard);
         document.getElementById('metricAddAisle').value = '';
     });
     let aisleLen = appSession.metricCards.length;
     for (var i = 0; i < aisleLen; i++) {
-        stockMetrics.aisleAddLocation(appSession.metricCards[i]);
-        appSession.metricCards[i] = stockMetrics.aisleDataChange(appSession.metricCards[i]);
+        stockMetrics.addMetricCard(appSession.metricCards[i]);
+        appSession.metricCards[i] = stockMetrics.updateMetricCard(appSession.metricCards[i]);
     }
     document.getElementById('metrics').addEventListener('change', (event) => {
         let totalCases = stockMetrics.getInteger('metricTotalCases'), 
@@ -298,32 +297,17 @@ class StockMetrics extends ElementDataAccess {
         appSession.metricTaskEnd = taskEnd;
         appSession.metricTaskLunch = taskLunch;
         appSession.metricCphTarget = cphTarget;
-
-        let totalAllMinutes = 0, 
-        allHours = taskEnd.hour - taskStart.hour, // The hours we have tasked without a lunch.
-        allMinutes = taskEnd.minute;// Minutes we have after the last hour.
-        if (taskStart.minute > 0) {
-            totalAllMinutes += 60 - taskStart.minute;// Minutes remaining in the first hour.
-            if (allHours > 0) {
-                allHours--;
-            }
-        }
-        totalAllMinutes += allMinutes;
-        if (allHours > 0) {
-            totalAllMinutes += allHours * 60;
-        }
-        if (taskLunch) {
-            if (totalAllMinutes > 60) {
-                totalAllMinutes -= 60;// We're going to take away X minutes for lunch, but only if we have more than X minutes tasked.
-            }
-        }
-        let mpcTarget = 60/cphTarget; // Minutes in one hour divided by the target cases per hour gives the minutes per case.
-        let caseProjection = (totalAllMinutes / mpcTarget) * taskedAssociates;
-        stockMetrics.setInteger('metricProjectedCases', caseProjection);
         
+        let elapsedMinutes = stockMetrics.getElapsedMinutes(taskStart, taskEnd);
+        elapsedMinutes = stockMetrics.lunchElapsedMinutes(elapsedMinutes, taskLunch);
+        
+        let mpcTarget = 60/cphTarget; // Minutes in one hour divided by the target cases per hour gives the minutes per case.
+        let caseProjection = (elapsedMinutes / mpcTarget) * taskedAssociates;
+        stockMetrics.setInteger('metricProjectedCases', caseProjection);
+
         let aisleLen = appSession.metricCards.length;
         for (var i = 0; i < aisleLen; i++) {
-            appSession.metricCards[i] = stockMetrics.aisleDataChange(appSession.metricCards[i]);
+            appSession.metricCards[i] = stockMetrics.updateMetricCard(appSession.metricCards[i]);
         }
         window.localStorage.setItem('appSession', JSON.stringify(appSession));
     });
