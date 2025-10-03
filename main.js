@@ -127,10 +127,10 @@ class StockMetrics extends ElementDataAccess {
         
         this.setTime('metricWishe' + metricCard.id, {'hour' : wisheHour, 'minute' :  wisheMinute});
 
-        if (taskCph == 0) {// We don't want to update the time the task ends yet.
+        //if (taskCph == 0) {// We don't want to update the time the task ends yet.
             // The task may go over the alloted time.
-            this.setTime('metricTaskEnd' + metricCard.id, {'hour' : wisheHour, 'minute' :  wisheMinute});
-        }
+            //this.setTime('metricTaskEnd' + metricCard.id, {'hour' : wisheHour, 'minute' :  wisheMinute});
+        //} Reloading the page causes this to overwrite saved times. For the time being we're going to comment it out.
         taskEnd = this.getTime('metricTaskEnd' + metricCard.id);
         metricCard.taskEnd = taskEnd;
 
