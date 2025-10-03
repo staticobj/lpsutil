@@ -33,7 +33,7 @@ footer {
 }
 .ui-metric-card {
     max-width: 1280px;
-    margin: 4px auto;
+    margin: 10px auto;
     background-color: #ffffff;
     border: 1px solid #000000;
 
@@ -63,7 +63,7 @@ div.ui-metrics-add {
     }
 }
 div.ui-whitespace {
-    margin: 20px 10px 20px 10px;
+    margin: 10px 12px 10px 12px;
 }
 input {
     border: 1px solid #1f1a3d;
@@ -86,29 +86,21 @@ div.ui-table {
 div.ui-table-row {
         display: table-row;
         width: 100%;
-        padding-top: 5px;
-        padding-bottom: 5px;
-        clear: both;
 }
 div.ui-table-col-50 {
-    float: left;/* buggy browsers */
-    display: table-column;
+    display: table-cell;
     width: 50%;
     padding: 5px 0 5px 0;
 }
-div.ui-table-col-100 {
-    float: left;/* buggy browsers */
-    display: table-column;
-    width: 100%;
-    padding: 5px 0 5px 0;
-}
 .ui-attention {
-    position: relative;
+    width: 100%;
+}
+.ui-attention p {
     color: #ffffff;
     margin: 5px;
     padding: 10px;
     background-color: #a77bca;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 div.ui-table-add-metric {
     display: table;

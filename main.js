@@ -56,7 +56,6 @@ class ElementDataAccess {
         }
         return false;
     }
-
 }
 class StockMetrics extends ElementDataAccess {
     data = {};
@@ -66,7 +65,7 @@ class StockMetrics extends ElementDataAccess {
         if (ls == null) {
             ls = {
                 "metricTotalCases": 0, 
-                "metricTaskedAssociates": 0, 
+                "metricTaskAssociates": 0, 
                 "metricTaskStart": 0,
                 "metricTaskEnd": 0, 
                 "metricTaskLunch": true, 
@@ -98,15 +97,21 @@ class StockMetrics extends ElementDataAccess {
     updateMetricCard(metricCard) {
         let cphTarget = this.getInteger('metricCphTarget'), 
         taskCases = this.getInteger('metricCases' + metricCard.id),
+        taskAssociates = this.getInteger('metricTaskAssociates' + metricCard.id),
         taskStart = this.getTime('metricTaskStart' + metricCard.id),
         taskLunch = this.isChecked('metricTaskLunch' + metricCard.id),
         taskEnd = this.getTime('metricTaskEnd' + metricCard.id),
         taskCph = this.getInteger('metricTaskCph' + metricCard.id);
         metricCard.taskCases = taskCases;
+        metricCard.taskAssociates = taskAssociates;
         metricCard.taskStart = taskStart;
         metricCard.taskLunch = taskLunch;
 
-        let wisheAllMinutes = (60 / cphTarget) * taskCases; // Divide the target cases by 60 minutes for the time per case, and multiply by the tasked cases for the total minutes tasked.
+        let cphAssoc = cphTarget;
+        if (taskAssociates > 1) {
+            cphAssoc = cphAssoc * taskAssociates;
+        }
+        let wisheAllMinutes = (60 / cphAssoc) * taskCases; // Divide the target cases by 60 minutes for the time per case, and multiply by the tasked cases for the total minutes tasked.
         if (taskLunch) {
             if (wisheAllMinutes > 60) {
                 wisheAllMinutes += 60;// We're going to add X minutes for lunch, but only if we have more than X minutes tasked.
@@ -138,7 +143,7 @@ class StockMetrics extends ElementDataAccess {
         }
         this.setInteger('metricTimeloss' + metricCard.id, elapsedTimeloss);
 
-        let caseProjection = Math.ceil(60 / (elapsedMinutes / taskCases));// Total task minutes divided by the number of cases for the minutes per case. Then divided that by how many minutes are in an hour to get the cases per minute.
+        let caseProjection = Math.floor(60 / (elapsedMinutes / taskCases));// Total task minutes divided by the number of cases for the minutes per case. Then divided that by how many minutes are in an hour to get the cases per minute.
         this.setInteger('metricTaskCph' + metricCard.id, caseProjection);
         return metricCard;
     }
@@ -151,19 +156,9 @@ class StockMetrics extends ElementDataAccess {
             uiHeadingDelete = document.createElement('div'), 
             uiWhitespace = document.createElement('div'),
             uiTable = document.createElement('div'),
-            uiTableRow = document.createElement('div'),
-            uiTableCol1Cases = document.createElement('div'),
-            uiTableCol2Cases = document.createElement('div'),
-            uiInputTaskCases = document.createElement('input'),
-            uiTableCol1TaskStart = document.createElement('div'),
-            uiTableCol2TaskStart = document.createElement('div'),
-            uiInputTaskStart = document.createElement('input'),
             uiTableCol1TaskLunch = document.createElement('div'),
             uiTableCol2TaskLunch = document.createElement('div'),
-            uiInputTaskLunch = document.createElement('input'),
-            uiTableCol1TaskEnd = document.createElement('div'),
-            uiTableCol2TaskEnd = document.createElement('div'),
-            uiInputTaskEnd = document.createElement('input'),
+            uiInputTaskLunch = document.createElement('input'), 
             uiTableCol1Wishe = document.createElement('div'),
             uiPWishe = document.createElement('p'),
             uiTableCol1Cph = document.createElement('div'),
@@ -172,85 +167,80 @@ class StockMetrics extends ElementDataAccess {
             uiTableCol1Timeloss = document.createElement('div'),
             uiPTimeloss = document.createElement('p');
 
+        let addRowInput = (id, name, type, value) => {
+            let uiTableRow = document.createElement('div'), 
+            uiTableCol1 = document.createElement('div'), 
+            uiTableCol2 = document.createElement('div'), 
+            uiInput = document.createElement('input');
+            uiTableRow.className = 'ui-table-row';
+            uiTableCol1.className = 'ui-table-col-50';
+            uiTableCol1.innerText = name;
+            uiTableRow.appendChild(uiTableCol1);
+            uiTableCol2.className = 'ui-table-col-50';
+            switch(type) {
+                case 'number':
+                    uiInput.setAttribute('type', 'number');
+                    break;
+                case 'time':
+                    uiInput.setAttribute('type', 'time');
+                    uiInput.setAttribute('min', '00:00');
+                    uiInput.setAttribute('max', '24:00');
+                    value = Math.floor(value.hour).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}) + ':' + Math.floor(value.minute).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})
+                    break;
+            }
+            uiInput.setAttribute('value', value);
+            uiInput.setAttribute('id', id);
+            uiTableCol2.appendChild(uiInput);
+            uiTableRow.appendChild(uiTableCol2);
+            uiTable.appendChild(uiTableRow);
+        };
         uiMetricCard.className = 'ui-metric-card';
 
         uiWhitespace.className = 'ui-whitespace';
         uiTable.id = 'marked_completed_' + metricCard.id;
-        uiTable.className = 'ui-uiTable';
+        uiTable.className = 'ui-table';
         uiTable.style.opacity = '100%';
-        uiTableRow.className = 'ui-table-row';
 
-        uiTableCol1Cases.className = 'ui-table-col-50';
-        uiTableCol1Cases.innerText = 'Cases';
-        uiTableRow.appendChild(uiTableCol1Cases);
-        uiTableCol2Cases.className = 'ui-table-col-50';
-        uiInputTaskCases.setAttribute('type', 'number');
-        uiInputTaskCases.setAttribute('value', metricCard.taskCases);
-        uiInputTaskCases.setAttribute('id', 'metricCases' + metricCard.id);
-        uiTableCol2Cases.appendChild(uiInputTaskCases);
-        uiTableRow.appendChild(uiTableCol2Cases);
+        addRowInput('metricCases' + metricCard.id, 'Cases', 'number', metricCard.taskCases);
+        addRowInput('metricTaskAssociates' + metricCard.id, 'Task Associates', 'number', metricCard.taskAssociates);
+        addRowInput('metricTaskStart' + metricCard.id, 'Task Start', 'time', metricCard.taskStart);
+        addRowInput('metricTaskEnd' + metricCard.id, 'Task End', 'time', metricCard.taskEnd);
 
-        uiTableCol1TaskStart.className = 'ui-table-col-50';
-        uiTableCol1TaskStart.innerText = "Task Start";
-        uiTableRow.appendChild(uiTableCol1TaskStart);
-        uiTableCol2TaskStart.className = 'ui-table-col-50';
-        uiInputTaskStart.setAttribute('type', 'time');
-        uiInputTaskStart.setAttribute('min', '00:00');
-        uiInputTaskStart.setAttribute('max', '24:00');
-        uiInputTaskStart.setAttribute('value', Math.floor(metricCard.taskStart.hour).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}) + ':' + Math.floor(metricCard.taskStart.minute).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}));
-        uiInputTaskStart.setAttribute('id', 'metricTaskStart' + metricCard.id);
-        uiTableCol2TaskStart.appendChild(uiInputTaskStart);
-        uiTableRow.appendChild(uiTableCol2TaskStart);
-
-        uiTableCol1TaskEnd.className = 'ui-table-col-50';
-        uiTableCol1TaskEnd.innerText = "Task End";
-        uiTableRow.appendChild(uiTableCol1TaskEnd);
-        uiTableCol2TaskEnd.className = 'ui-table-col-50';
-        uiInputTaskEnd.setAttribute('type', 'time');
-        uiInputTaskEnd.setAttribute('min', '00:00');
-        uiInputTaskEnd.setAttribute('max', '24:00');
-        uiInputTaskEnd.setAttribute('value', Math.floor(metricCard.taskEnd.hour).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}) + ':' + Math.floor(metricCard.taskEnd.minute).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false}));
-        uiInputTaskEnd.setAttribute('id', 'metricTaskEnd' + metricCard.id);
-        uiTableCol2TaskEnd.appendChild(uiInputTaskEnd);
-        uiTableRow.appendChild(uiTableCol2TaskEnd);
-
+        
+        let uiTableRow1 = document.createElement('div');
+        uiTableRow1.className = 'ui-table-row';
         uiTableCol1TaskLunch.className = 'ui-table-col-50';
         uiTableCol1TaskLunch.innerText = "Lunch";
-        uiTableRow.appendChild(uiTableCol1TaskLunch);
+        uiTableRow1.appendChild(uiTableCol1TaskLunch);
         uiTableCol2TaskLunch.className = 'ui-table-col-50';
         uiInputTaskLunch.setAttribute('type', 'checkbox');
         uiInputTaskLunch.setAttribute('value', 1);
         uiInputTaskLunch.checked = metricCard.taskLunch;
         uiInputTaskLunch.setAttribute('id', 'metricTaskLunch' + metricCard.id);
         uiTableCol2TaskLunch.appendChild(uiInputTaskLunch);
-        uiTableRow.appendChild(uiTableCol2TaskLunch);
-
-        uiTableCol1Wishe.className = 'ui-table-col-100';
-        uiPWishe.className = 'ui-attention';
-        uiPWishe.innerText = 'When it should have ended: ';
-        uiPWishe.innerHTML += '<span id="metricWishe' + metricCard.id + '">00:00</span>';
-        uiTableCol1Wishe.appendChild(uiPWishe);
-        uiTableRow.appendChild(uiTableCol1Wishe);
-
-
+        uiTableRow1.appendChild(uiTableCol2TaskLunch);
+        uiTable.appendChild(uiTableRow1);
+        
+        let uiTableRow3 = document.createElement('div');
+        uiTableRow3.className = 'ui-table-row';
         uiTableCol1Cph.className = 'ui-table-col-50';
         uiTableCol1Cph.innerText = "CPH";
-        uiTableRow.appendChild(uiTableCol1Cph);
+        uiTableRow3.appendChild(uiTableCol1Cph);
         uiTableCol2Cph.className = 'ui-table-col-50';
         uiSpanCph.innerText = 0;
         uiSpanCph.setAttribute('id', 'metricTaskCph' + metricCard.id);
         uiTableCol2Cph.appendChild(uiSpanCph);
-        uiTableRow.appendChild(uiTableCol2Cph);
+        uiTableRow3.appendChild(uiTableCol2Cph);
+        uiTable.appendChild(uiTableRow3);
 
-        uiTableCol1Timeloss.className = 'ui-table-col-100';
-        uiPTimeloss.className = 'ui-attention';
-        uiPTimeloss.innerHTML = 'We lost <span id="metricTimeloss' + metricCard.id + '">0</span> minutes.';
-        uiTableCol1Timeloss.appendChild(uiPTimeloss);
-        uiTableRow.appendChild(uiTableCol1Timeloss);
-
-        uiTable.appendChild(uiTableRow);
         uiWhitespace.appendChild(uiTable);
         uiMetricCard.prepend(uiWhitespace);
+        
+        let uiAttention2 = document.createElement('div');
+        uiAttention2.className = 'ui-attention';
+        uiPWishe.innerHTML = 'The task should have ended at <span id="metricWishe' + metricCard.id + '">00:00</span>. We lost <span id="metricTimeloss' + metricCard.id + '">0</span> minutes.';
+        uiAttention2.appendChild(uiPWishe);
+        uiMetricCard.appendChild(uiAttention2);
         
         uiHeading.className = 'heading';
         uiHeading.innerText = metricCard.name;
@@ -283,7 +273,7 @@ class StockMetrics extends ElementDataAccess {
 (function() {
     let stockMetrics = new StockMetrics();
     stockMetrics.setInteger('metricTotalCases', stockMetrics.data.metricTotalCases);
-    stockMetrics.setInteger('metricTaskedAssociates', stockMetrics.data.metricTaskedAssociates);
+    stockMetrics.setInteger('metricTaskAssociates', stockMetrics.data.metricTaskAssociates);
     stockMetrics.setTime('metricTaskStart', stockMetrics.data.metricTaskStart);
     stockMetrics.setTime('metricTaskEnd', stockMetrics.data.metricTaskEnd);
     //stockMetrics.isChecked('metricTaskLunch');
@@ -296,6 +286,7 @@ class StockMetrics extends ElementDataAccess {
             "id": id, 
             "name": name,
             "taskCases": 0,
+            "taskAssociates": 1,
             "taskStart": {"hour": 0, "minute": 0},
             "taskEnd": {"hour": 0, "minute": 0},
             "taskLunch": false
@@ -316,14 +307,14 @@ class StockMetrics extends ElementDataAccess {
     }
     document.getElementById('metrics').addEventListener('change', (event) => {
         let totalCases = stockMetrics.getInteger('metricTotalCases'), 
-        taskedAssociates = stockMetrics.getInteger('metricTaskedAssociates'), 
+        taskAssociates = stockMetrics.getInteger('metricTaskAssociates'), 
         taskStart = stockMetrics.getTime('metricTaskStart'), 
         taskEnd = stockMetrics.getTime('metricTaskEnd'), 
         taskLunch = stockMetrics.isChecked('metricTaskLunch'), 
         cphTarget = stockMetrics.getInteger('metricCphTarget');
         
         stockMetrics.data.metricTotalCases = totalCases;
-        stockMetrics.data.metricTaskedAssociates = taskedAssociates;
+        stockMetrics.data.metricTaskAssociates = taskAssociates;
         stockMetrics.data.metricTaskStart = taskStart;
         stockMetrics.data.metricTaskEnd = taskEnd;
         stockMetrics.data.metricTaskLunch = taskLunch;
@@ -333,7 +324,7 @@ class StockMetrics extends ElementDataAccess {
         elapsedMinutes = stockMetrics.lunchElapsedMinutes(elapsedMinutes, taskLunch);
         
         let mpcTarget = 60/cphTarget; // Minutes in one hour divided by the target cases per hour gives the minutes per case.
-        let caseProjection = (elapsedMinutes / mpcTarget) * taskedAssociates;
+        let caseProjection = (elapsedMinutes / mpcTarget) * taskAssociates;
         stockMetrics.setInteger('metricProjectedCases', caseProjection);
 
         let aisleLen = stockMetrics.data.metricCards.length;
