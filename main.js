@@ -37,8 +37,15 @@ class ElementDataAccess {
         {
             value.hour = Math.floor(value.hour).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false});
             value.minute = Math.floor(value.minute).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false});
-            let element = document.getElementById(id), time;
+            let element = document.getElementById(id), time, period;
+            if (value.hasOwnProperty('period')) {
+                period = value.period;
+                delete value.period;
+            }
             time = Object.values(value).join(':');
+            if (period) {
+                time += ' ' + period;
+            }
             if (element.innerText) {
                 element.innerText = time;
                 return true;
@@ -125,7 +132,13 @@ class StockMetrics extends ElementDataAccess {
         wisheMinute = wisheAllMinutes % 60;
         wisheAllMinutes -= taskStart.minute;
         
-        this.setTime('metricWishe' + metricCard.id, {'hour' : wisheHour, 'minute' :  wisheMinute});
+        // Convert time from 24 hour to 12 hour.
+        let period = "AM";
+        if (wisheHour > 12) {
+            period = "PM";
+        }
+        wisheHour = wisheHour % 12 || 12;
+        this.setTime('metricWishe' + metricCard.id, {'hour' : wisheHour, 'minute' :  wisheMinute, 'period': period});
 
         //if (taskCph == 0) {// We don't want to update the time the task ends yet.
             // The task may go over the alloted time.
