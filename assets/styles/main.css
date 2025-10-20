@@ -1,1 +1,185 @@
+html, body {
+    padding: 0;
+}
+body {
+    font-family: Verdana, Tahoma, sans-serif;
+    font-size: 18px;
+    background-color: #1f1a3d;
+    padding-top: 50px;
+}
 
+header {
+    z-index: 10;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: #3a2a6d;
+    border-bottom: 1px solid #000000;
+
+    h1 {
+        text-align: center;
+        color: #ffffff;
+        width: 100%;
+        margin: 0 auto;
+        padding: 5px 0 0 0;
+    }
+}
+footer {
+    text-align: center;
+    color: #ffffff;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.ui-metric-card {
+    max-width: 1280px;
+    margin: 10px auto;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+
+    h2 {
+        text-align: center;
+        color: #ffffff;
+        width: 100%;
+        padding: 10px 0 10px 0;
+        margin: 0;
+        background-color: #3a2a6d;
+    }
+}
+div.ui-metric-card-whitespace {
+    margin: 10px 12px 10px 12px;
+}
+
+form.ui-metric-card-add {
+    max-width: 1280px;
+    margin: 10px auto;
+    background-color: #3a2a6d;
+    border: 1px solid #000000;
+}
+div.ui-metric-card-add {
+    text-align: center;
+    color: #ffffff;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: #3a2a6d;
+}
+div.ui-metric-card-add-whitespace {
+    margin: 5px 10px 5px 10px;
+}
+
+input {
+    font-size: 18px;
+    border: 1px solid #1f1a3d;
+    border-radius: 3px;
+}
+input:focus {
+    outline: none;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+input[type="number"] {
+    width: 100px;
+    -moz-appearance: textfield;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+div.ui-table {
+    display: table;
+    width: 100%;
+}
+div.ui-table-row {
+    display: table-row;
+    width: 100%;
+}
+div.ui-table-cell {
+    display: table-cell;
+    padding: 5px 0 5px 0;
+}
+div.ui-table-cell-10 { width: 10%; }
+div.ui-table-cell-20 { width: 20%; }
+div.ui-table-cell-50 { width: 50%; }
+div.ui-table-cell-80 { width: 80%; }
+div.ui-table-cell-90 { width: 90%; }
+
+div.ui-metric-card-add-input {
+    height: 40px;
+    border: 0;
+    border-radius: 0;
+}
+div.ui-metric-card-add-button {
+    height: 40px;
+    border: 0;
+    border-radius: 0;
+}
+input.ui-metric-card-input-name {
+    font-size: 24px;
+    font-weight: bold;
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 5px;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    border-left: 1px solid #000000;
+    border-right: 0;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 0;
+    box-sizing: border-box;
+}
+button.ui-metric-card-button-add {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    background-color: #a77bca;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    border-left: 0;
+    border-right: 1px solid #000000;
+    border-top-left-radius: 0;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 5px;
+    box-sizing: border-box;
+    background-image: url('../images/metric-card-button-add.png');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.ui-metric-card-delete {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    margin-left: 10px;
+    background-color: #a77bca;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    background-image: url('../images/metric-card-button-delete.png');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.ui-attention {
+    width: 100%;
+}
+.ui-attention p {
+    color: #ffffff;
+    margin: 5px;
+    padding: 10px;
+    background-color: #a77bca;
+    border-radius: 5px;
+}
