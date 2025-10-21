@@ -164,6 +164,11 @@ class StockMetrics extends ElementDataAccess {
         let div = document.createElement('div'), 
         metricCards = document.getElementById('metricCards');
         let uiMetricCard = document.createElement('div'), 
+            uiHeadingTable = document.createElement('div'), 
+            uiHeadingTableRow = document.createElement('div'), 
+            uiHeadingTableCol1 = document.createElement('div'), 
+            uiHeadingTableCol2 = document.createElement('div'), 
+            uiHeadingTableCol3 = document.createElement('div'), 
             uiHeading = document.createElement('h2'),
             uiHeadingMarkComplete = document.createElement('input'),
             uiHeadingDelete = document.createElement('div'), 
@@ -247,16 +252,23 @@ class StockMetrics extends ElementDataAccess {
         uiTable.appendChild(uiTableRow3);
 
         uiWhitespace.appendChild(uiTable);
-        uiMetricCard.prepend(uiWhitespace);
         
         let uiAttention2 = document.createElement('div');
         uiAttention2.className = 'ui-attention';
         uiPWishe.innerHTML = 'The task should have ended at <span id="metricWishe' + metricCard.id + '">00:00</span>. We lost <span id="metricTimeloss' + metricCard.id + '">0</span> minutes.';
         uiAttention2.appendChild(uiPWishe);
-        uiMetricCard.appendChild(uiAttention2);
+        uiWhitespace.appendChild(uiAttention2);
+
+        uiMetricCard.prepend(uiWhitespace);
         
-        uiHeading.className = 'heading';
+        uiHeadingTable.className = 'ui-table ui-metric-card-heading';
+        uiHeadingTableRow.className = 'ui-table-row';
+        uiHeadingTableCol1.className = 'ui-table-cell ui-table-cell-20';
+        uiHeadingTableCol2.className = 'ui-table-cell ui-table-cell-60';
+        uiHeadingTableCol3.className = 'ui-table-cell ui-table-cell-20';
+        uiHeading.className = 'ui-metric-card-heading-h2';
         uiHeading.innerText = metricCard.name;
+        uiHeadingTableCol2.appendChild(uiHeading);
         // Future addition to check for completion of tasks
         //uiHeadingMarkComplete.id = 'metricMarkComplete' + id;
         //uiHeadingMarkComplete.setAttribute('type', 'checkbox');
@@ -277,8 +289,12 @@ class StockMetrics extends ElementDataAccess {
             this.dataSave();
             uiMetricCard.remove();
         });
-        uiHeading.appendChild(uiHeadingDelete);
-        uiMetricCard.prepend(uiHeading);
+        uiHeadingTableCol3.appendChild(uiHeadingDelete);
+        uiHeadingTableRow.appendChild(uiHeadingTableCol1);
+        uiHeadingTableRow.appendChild(uiHeadingTableCol2);
+        uiHeadingTableRow.appendChild(uiHeadingTableCol3);
+        uiHeadingTable.appendChild(uiHeadingTableRow);
+        uiMetricCard.prepend(uiHeadingTable);
         metricCards.prepend(uiMetricCard);
     }
 }
