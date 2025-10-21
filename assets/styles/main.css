@@ -26,27 +26,53 @@ header {
         padding: 5px 0 0 0;
     }
 }
+main {
+    max-width: 768px;
+    margin: 10px auto;
+}
 footer {
     text-align: center;
     color: #ffffff;
     width: 100%;
     margin: 0 auto;
 }
-
-.ui-metric-card {
-    max-width: 1280px;
+.ui-metric-overview {
+    display: block;
+    max-width: 768px;
     margin: 10px auto;
     background-color: #ffffff;
-    border: 1px solid #000000;
-
-    h2 {
-        text-align: center;
-        color: #ffffff;
-        width: 100%;
-        padding: 10px 0 10px 0;
-        margin: 0;
-        background-color: #3a2a6d;
+}
+.ui-metric-card {
+    display: inline-block;
+    max-width: 380px;
+    margin: 10px 0 0 0;
+    background-color: #ffffff;
+    overflow: auto;/* Fix for collapsing margins */
+}
+.ui-metric-card:nth-child(even) {
+    margin: 10px 0 0 8px;
+}
+@media only screen and (max-width: 768px) {
+    .ui-metric-overview {
+        max-width: 384px;
     }
+    .ui-metric-card {
+        display: block;
+        max-width: 384px;
+        margin: 10px auto 0 auto !important;/* Must override all margins below 768px */
+    }
+}
+.ui-metric-card-heading {
+    padding: 0;
+    margin: 0;
+    background-color: #3a2a6d;
+}
+.ui-metric-card-heading-h2 {
+    text-align: center;
+    color: #ffffff;
+    width: 100%;
+    margin: 0;
+    padding: 10px 0 10px 0;
 }
 div.ui-metric-card-whitespace {
     margin: 10px 12px 10px 12px;
@@ -161,10 +187,11 @@ button.ui-metric-card-button-add {
     background-position: center;
 }
 .ui-metric-card-delete {
-    display: inline-block;
+    line-height: 40px;
+    display: block;
     width: 32px;
     height: 32px;
-    margin-left: 10px;
+    margin: 0 5px 0 auto;
     background-color: #a77bca;
     border: 1px solid #000000;
     border-radius: 5px;
